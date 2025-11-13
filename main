@@ -1,0 +1,148 @@
+# CodeAlpha_Java_Grademanagement_System
+Student grade management system 
+import java.util.*;
+
+class Student {
+    private String name;
+    private List<Integer> grades;
+
+    public Student(String name) {
+        this.name = name;
+        this.grades = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void addGrade(int grade) {
+        grades.add(grade);
+    }
+
+    public List<Integer> getGrades() {
+        return grades;
+    }
+
+    public double getAverageGrade() {
+        if (grades.isEmpty()) return 0;
+        int sum = 0;
+        for (int g : grades) {
+            sum += g;
+        }
+        return (double) sum / grades.size();
+    }
+
+    @Override
+    public String toString() {
+        return "Student: " + name + ", Grades: " + grades + ", Average: " + String.format("%.2f", getAverageGrade());
+    }
+}
+
+public class Main {
+    private static final Scanner sc = new Scanner(System.in);
+    private static final Map<String, Student> students = new HashMap<>();
+
+    public static void main(String[] args) {
+        int choice = -1;
+        while (choice != 6) {
+            printMenu();
+            try {
+                System.out.print("Enter your choice: ");
+                choice = Integer.parseInt(sc.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+                continue;
+            }
+
+            switch (choice) {
+                case 1 -> addStudent();
+                case 2 -> addGrade();
+                case 3 -> viewAllStudents();
+                case 4 -> viewStudentDetails();
+                case 5 -> showTopStudent();
+                case 6 -> System.out.println("Exiting... Goodbye!");
+                default -> System.out.println("Invalid choice! Please try again.");
+            }
+        }
+    }
+
+    private static void printMenu() {
+        System.out.println("\n===== Student Grade Manager =====");
+        System.out.println("1. Add Student");
+        System.out.println("2. Add Grade to Student");
+        System.out.println("3. View All Students");
+        System.out.println("4. View Student Details");
+        System.out.println("5. Show Top Student");
+        System.out.println("6. Exit");
+    }
+
+    private static void addStudent() {
+        System.out.print("Enter student name: ");
+        String name = sc.nextLine().trim();
+        if (name.isEmpty()) {
+            System.out.println("Name cannot be empty.");
+            return;
+        }
+        if (students.containsKey(name)) {
+            System.out.println("Student already exists!");
+        } else {
+            students.put(name, new Student(name));
+            System.out.println("Student added successfully.");
+        }
+    }
+
+    private static void addGrade() {
+        System.out.print("Enter student name: ");
+        String name = sc.nextLine().trim();
+        Student student = students.get(name);
+        if (student == null) {
+            System.out.println("Student not found!");
+            return;
+        }
+        System.out.print("Enter grade (0–100): ");
+        String gradeStr = sc.nextLine().trim();
+        int grade;
+        try {
+            grade = Integer.parseInt(gradeStr);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Enter an integer grade between 0 and 100.");
+            return;
+        }
+        if (grade < 0 || grade > 100) {
+            System.out.println("Invalid grade! Must be between 0 and 100.");
+        } else {
+            student.addGrade(grade);
+            System.out.println("Grade added successfully.");
+        }
+    }
+
+    private static void viewAllStudents() {
+        if (students.isEmpty()) {
+            System.out.println("No students available.");
+        } else {
+            for (Student s : students.values()) {
+                System.out.println(s);
+            }
+        }
+    }
+
+    private static void viewStudentDetails() {
+        System.out.print("Enter student name: ");
+        String name = sc.nextLine().trim();
+        Student student = students.get(name);
+        if (student == null) {
+            System.out.println("Student not found!");
+        } else {
+            System.out.println(student);
+        }
+    }
+
+    private static void showTopStudent() {
+        if (students.isEmpty()) {
+            System.out.println("No students available.");
+            return;
+        }
+        Student top = Collections.max(students.values(), Comparator.comparingDouble(Student::getAverageGrade));
+        System.out.println("Top Student: " + top);
+    }
+}
